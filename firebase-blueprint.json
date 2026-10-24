@@ -1,0 +1,177 @@
+{
+  "entities": {
+    "Letter": {
+      "title": "Letter",
+      "description": "A letter submitted to Hạ Vi Vi's winter mailbox under Tâm sự, Feedback, or Góp ý tưởng, with optional attached image.",
+      "type": "object",
+      "properties": {
+        "sender": {
+          "type": "string",
+          "description": "Display name of the sender or anonymous label.",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "isAnonymous": {
+          "type": "boolean",
+          "description": "Whether the sender chose to hide their name."
+        },
+        "content": {
+          "type": "string",
+          "description": "Body text of the mailbox letter.",
+          "minLength": 5,
+          "maxLength": 800
+        },
+        "topic": {
+          "type": "string",
+          "description": "Mailbox category selected by the sender.",
+          "enum": ["Tâm sự", "Feedback", "Góp ý tưởng"],
+          "maxLength": 30
+        },
+        "stamp": {
+          "type": "string",
+          "description": "Decorative winter stamp chosen for the envelope.",
+          "enum": ["snowflake", "pine", "dove", "tea", "star"],
+          "maxLength": 20
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "Optional compressed image Data URI or HTTPS image URL attached to the letter.",
+          "maxLength": 250000
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the letter was sealed."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of the latest heart or reply count update."
+        },
+        "createdAtMs": {
+          "type": "integer",
+          "description": "Epoch milliseconds used for deterministic chronological ordering."
+        },
+        "createdAtLabel": {
+          "type": "string",
+          "description": "Formatted Vietnamese timestamp label displayed on the envelope.",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "heartsCount": {
+          "type": "integer",
+          "description": "Number of warm hearts given to this letter."
+        },
+        "repliesCount": {
+          "type": "integer",
+          "description": "Number of replies in the letter's replies subcollection."
+        },
+        "status": {
+          "type": "string",
+          "description": "Moderation visibility status of the letter.",
+          "enum": ["approved", "archived"],
+          "maxLength": 20
+        },
+        "authorUid": {
+          "type": "string",
+          "description": "Firebase Auth UID if signed in, or 'anonymous' for unauthenticated visitors.",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      },
+      "required": [
+        "sender",
+        "isAnonymous",
+        "content",
+        "topic",
+        "stamp",
+        "createdAt",
+        "updatedAt",
+        "createdAtMs",
+        "createdAtLabel",
+        "heartsCount",
+        "repliesCount",
+        "status",
+        "authorUid"
+      ]
+    },
+    "LetterReply": {
+      "title": "LetterReply",
+      "description": "A reply message posted beneath a mailbox letter.",
+      "type": "object",
+      "properties": {
+        "letterId": {
+          "type": "string",
+          "description": "Parent letter document ID.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "sender": {
+          "type": "string",
+          "description": "Display name of the reply author.",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "content": {
+          "type": "string",
+          "description": "Reply body text.",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the reply was created."
+        },
+        "createdAtMs": {
+          "type": "integer",
+          "description": "Epoch milliseconds for chronological sorting."
+        },
+        "createdAtLabel": {
+          "type": "string",
+          "description": "Formatted Vietnamese date-time string.",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "isCreator": {
+          "type": "boolean",
+          "description": "True only when posted by verified creator Hạ Vi Vi."
+        },
+        "status": {
+          "type": "string",
+          "description": "Visibility status of the reply.",
+          "enum": ["approved", "archived"],
+          "maxLength": 20
+        },
+        "authorUid": {
+          "type": "string",
+          "description": "Firebase Auth UID if signed in, or 'anonymous'.",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      },
+      "required": [
+        "letterId",
+        "sender",
+        "content",
+        "createdAt",
+        "createdAtMs",
+        "createdAtLabel",
+        "isCreator",
+        "status",
+        "authorUid"
+      ]
+    }
+  },
+  "firestore": {
+    "/letters/{letterId}": {
+      "schema": "Letter",
+      "description": "Publicly readable approved letters in Hạ Vi Vi's winter mailbox."
+    },
+    "/letters/{letterId}/replies/{replyId}": {
+      "schema": "LetterReply",
+      "description": "Subcollection of replies associated with a specific mailbox letter."
+    }
+  }
+}

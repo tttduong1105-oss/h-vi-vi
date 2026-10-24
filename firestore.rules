@@ -1,0 +1,205 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Pillar 1: Global Default-Deny Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Hardened Global Helpers
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedCreator() {
+      return isSignedIn()
+        && request.auth.token.email_verified == true
+        && request.auth.token.email == 'tttduong1105@gmail.com';
+    }
+
+    function matchesCallerAuthorUid(authorUid) {
+      return (isSignedIn() && authorUid == request.auth.uid)
+        || (!isSignedIn() && authorUid == 'anonymous');
+    }
+
+    function isValidOptionalImage(data) {
+      return !('imageUrl' in data)
+        || (
+          data.imageUrl is string
+          && data.imageUrl.size() >= 12
+          && data.imageUrl.size() <= 250000
+          && data.imageUrl.matches('^(data:image/[a-zA-Z0-9+\\-]+;base64,[A-Za-z0-9+/=]+|https://[^\\s]+)$')
+        );
+    }
+
+    // Validation Blueprint: Letter
+    function isValidLetter(data) {
+      return data.keys().hasAll([
+          'sender',
+          'isAnonymous',
+          'content',
+          'topic',
+          'stamp',
+          'createdAt',
+          'updatedAt',
+          'createdAtMs',
+          'createdAtLabel',
+          'heartsCount',
+          'repliesCount',
+          'status',
+          'authorUid'
+        ])
+        && data.keys().hasOnly([
+          'sender',
+          'isAnonymous',
+          'content',
+          'topic',
+          'stamp',
+          'imageUrl',
+          'createdAt',
+          'updatedAt',
+          'createdAtMs',
+          'createdAtLabel',
+          'heartsCount',
+          'repliesCount',
+          'status',
+          'authorUid'
+        ])
+        && data.sender is string && data.sender.size() >= 1 && data.sender.size() <= 60
+        && data.isAnonymous is bool
+        && data.content is string && data.content.size() >= 5 && data.content.size() <= 800
+        && data.topic is string && data.topic.size() <= 30
+        && data.topic in ['Tâm sự', 'Feedback', 'Góp ý tưởng']
+        && data.stamp is string && data.stamp.size() <= 20
+        && data.stamp in ['snowflake', 'pine', 'dove', 'tea', 'star']
+        && isValidOptionalImage(data)
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp
+        && data.createdAtMs is int && data.createdAtMs > 0
+        && data.createdAtLabel is string && data.createdAtLabel.size() >= 1 && data.createdAtLabel.size() <= 40
+        && data.heartsCount is int && data.heartsCount >= 1 && data.heartsCount <= 1000000
+        && data.repliesCount is int && data.repliesCount >= 0 && data.repliesCount <= 100000
+        && data.status is string && data.status.size() <= 20
+        && data.status in ['approved', 'archived']
+        && data.authorUid is string && data.authorUid.size() >= 1 && data.authorUid.size() <= 128;
+    }
+
+    // Validation Blueprint: LetterReply
+    function isValidReply(data) {
+      return data.keys().hasAll([
+          'letterId',
+          'sender',
+          'content',
+          'createdAt',
+          'createdAtMs',
+          'createdAtLabel',
+          'isCreator',
+          'status',
+          'authorUid'
+        ])
+        && data.keys().hasOnly([
+          'letterId',
+          'sender',
+          'content',
+          'createdAt',
+          'createdAtMs',
+          'createdAtLabel',
+          'isCreator',
+          'status',
+          'authorUid'
+        ])
+        && isValidId(data.letterId)
+        && data.sender is string && data.sender.size() >= 1 && data.sender.size() <= 60
+        && data.content is string && data.content.size() >= 1 && data.content.size() <= 500
+        && data.createdAt is timestamp
+        && data.createdAtMs is int && data.createdAtMs > 0
+        && data.createdAtLabel is string && data.createdAtLabel.size() >= 1 && data.createdAtLabel.size() <= 40
+        && data.isCreator is bool
+        && data.status is string && data.status.size() <= 20
+        && data.status in ['approved', 'archived']
+        && data.authorUid is string && data.authorUid.size() >= 1 && data.authorUid.size() <= 128;
+    }
+
+    match /letters/{letterId} {
+      allow get: if isValidId(letterId) && existing().status == 'approved';
+      allow list: if existing().status == 'approved';
+
+      allow create: if isValidId(letterId)
+        && isValidLetter(incoming())
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time
+        && incoming().heartsCount == 1
+        && incoming().repliesCount == 0
+        && incoming().status == 'approved'
+        && matchesCallerAuthorUid(incoming().authorUid);
+
+      allow update: if isValidId(letterId)
+        && isValidLetter(incoming())
+        && existing().status == 'approved'
+        && incoming().status == existing().status
+        && incoming().createdAt == existing().createdAt
+        && incoming().authorUid == existing().authorUid
+        && incoming().sender == existing().sender
+        && incoming().isAnonymous == existing().isAnonymous
+        && incoming().content == existing().content
+        && incoming().topic == existing().topic
+        && incoming().stamp == existing().stamp
+        && incoming().createdAtMs == existing().createdAtMs
+        && incoming().createdAtLabel == existing().createdAtLabel
+        && incoming().updatedAt == request.time
+        && (
+          // Action 1: Add a warm heart (+1)
+          (
+            incoming().diff(existing()).affectedKeys().hasOnly(['heartsCount', 'updatedAt'])
+            && incoming().heartsCount == existing().heartsCount + 1
+          )
+          ||
+          // Action 2: Atomic reply counter increment (+1)
+          (
+            incoming().diff(existing()).affectedKeys().hasOnly(['repliesCount', 'updatedAt'])
+            && incoming().repliesCount == existing().repliesCount + 1
+          )
+        );
+
+      allow delete: if false;
+
+      match /replies/{replyId} {
+        allow get: if isValidId(letterId)
+          && isValidId(replyId)
+          && existing().status == 'approved'
+          && get(/databases/$(database)/documents/letters/$(letterId)).data.status == 'approved';
+
+        allow list: if existing().status == 'approved';
+
+        allow create: if isValidId(letterId)
+          && isValidId(replyId)
+          && isValidReply(incoming())
+          && incoming().letterId == letterId
+          && incoming().createdAt == request.time
+          && incoming().status == 'approved'
+          && (!incoming().isCreator || isVerifiedCreator())
+          && matchesCallerAuthorUid(incoming().authorUid)
+          && exists(/databases/$(database)/documents/letters/$(letterId))
+          && get(/databases/$(database)/documents/letters/$(letterId)).data.status == 'approved'
+          && getAfter(/databases/$(database)/documents/letters/$(letterId)).data.repliesCount
+             == get(/databases/$(database)/documents/letters/$(letterId)).data.repliesCount + 1;
+
+        allow update: if false;
+        allow delete: if false;
+      }
+    }
+  }
+}

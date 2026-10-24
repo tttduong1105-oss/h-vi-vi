@@ -1,0 +1,495 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: 'Lora', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  --color-snow: #F9FCFF;
+  --color-ice: #DCEEFF;
+  --color-frost: #B8D7F3;
+  --color-winter-sky: #8EB8E2;
+  --color-slate-blue: #587DA5;
+  --color-silver-mist: #D7E2EE;
+}
+
+html {
+  font-family: var(--font-sans);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom winter stationery background & textures */
+.winter-paper {
+  background-color: rgba(255, 255, 255, 0.88);
+  background-image: radial-gradient(#dceeff 0.75px, transparent 0.75px);
+  background-size: 16px 16px;
+}
+
+.frosted-glass {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(215, 226, 238, 0.8);
+}
+
+.frosted-glass-subtle {
+  background: rgba(249, 252, 255, 0.76);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(215, 226, 238, 0.65);
+}
+
+/* Postal stamp border styling */
+.postage-stamp {
+  border: 1px dashed #B8D7F3;
+  position: relative;
+}
+
+/* Letter ruled lines */
+.lined-paper {
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 27px,
+    #E8F1FA 28px
+  );
+  line-height: 28px;
+}
+
+/* Dreamy pastel sky background breathing & sparkle animations */
+@keyframes dreamyBgBreathe {
+  0%, 100% {
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+  50% {
+    transform: scale(1.045) translate3d(0, -6px, 0);
+  }
+}
+
+@keyframes dreamyAuraPulse {
+  0%, 100% {
+    opacity: 0.55;
+    transform: scale(0.96);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes dreamyStarTwinkle {
+  0%, 100% {
+    opacity: 0.45;
+    transform: translate3d(0, 0, 0) scale(0.86) rotate(-6deg);
+    filter: drop-shadow(0 0 4px rgba(255, 240, 165, 0.4));
+  }
+  50% {
+    opacity: 0.98;
+    transform: translate3d(0, -8px, 0) scale(1.12) rotate(8deg);
+    filter: drop-shadow(0 0 10px rgba(255, 238, 150, 0.85));
+  }
+}
+
+@keyframes dreamySparklePulse {
+  0%, 100% {
+    opacity: 0.35;
+    transform: translate3d(0, 0, 0) scale(0.75) rotate(0deg);
+  }
+  50% {
+    opacity: 0.95;
+    transform: translate3d(3px, -6px, 0) scale(1.16) rotate(15deg);
+  }
+}
+
+@keyframes dreamyBokehDrift {
+  0%, 100% {
+    opacity: 0.45;
+    transform: translate3d(0, 0, 0) scale(0.95);
+  }
+  50% {
+    opacity: 0.82;
+    transform: translate3d(-8px, -12px, 0) scale(1.08);
+  }
+}
+
+.dreamy-bg-breathe {
+  animation: dreamyBgBreathe 16s ease-in-out infinite;
+  will-change: transform;
+}
+
+.dreamy-aura-pulse {
+  animation: dreamyAuraPulse 9s ease-in-out infinite;
+}
+
+.dreamy-star-twinkle {
+  position: absolute;
+  animation-name: dreamyStarTwinkle;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.dreamy-sparkle-pulse {
+  position: absolute;
+  animation-name: dreamySparklePulse;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.dreamy-bokeh-drift {
+  position: absolute;
+  animation-name: dreamyBokehDrift;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+/* Gentle snowfall animation */
+@keyframes snowfall {
+  0% {
+    transform: translateY(-10px) translateX(0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.85;
+  }
+  90% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translateY(105vh) translateX(25px);
+    opacity: 0.2;
+  }
+}
+
+.snowflake-particle {
+  position: fixed;
+  top: -20px;
+  pointer-events: none;
+  z-index: 20;
+  color: #B8D7F3;
+  user-select: none;
+  animation-name: snowfall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+/* Gentle music box disc rotation */
+@keyframes musicDiscSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.music-disc-spin {
+  animation: musicDiscSpin 9s linear infinite;
+}
+
+.music-disc-paused {
+  animation-play-state: paused;
+}
+
+/* 3D Snow Letter Intro Envelope Mechanics */
+.envelope-perspective {
+  perspective: 1300px;
+}
+
+.envelope-flap-card {
+  transform-style: preserve-3d;
+  transform-origin: top center;
+  transition: transform 640ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.envelope-flap-closed {
+  transform: rotateX(0deg);
+}
+
+.envelope-flap-opened {
+  transform: rotateX(180deg);
+}
+
+.envelope-face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.envelope-face-back {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: rotateX(180deg);
+}
+
+@keyframes snowLetterEnter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.snow-letter-enter {
+  animation: snowLetterEnter 560ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Pastel Ombre Backdrop & Breathing Light Auras */
+.ombre-intro-backdrop {
+  background: linear-gradient(
+    135deg,
+    rgba(205, 232, 255, 0.97) 0%,
+    rgba(232, 243, 255, 0.97) 26%,
+    rgba(253, 228, 243, 0.96) 54%,
+    rgba(226, 232, 255, 0.97) 78%,
+    rgba(210, 238, 255, 0.98) 100%
+  );
+}
+
+@keyframes ombreOrbFloatA {
+  0%, 100% {
+    opacity: 0.72;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    opacity: 0.95;
+    transform: translate3d(18px, -14px, 0) scale(1.08);
+  }
+}
+
+@keyframes ombreOrbFloatB {
+  0%, 100% {
+    opacity: 0.68;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    opacity: 0.92;
+    transform: translate3d(-20px, 14px, 0) scale(1.1);
+  }
+}
+
+.ombre-orb-a {
+  animation: ombreOrbFloatA 7s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.ombre-orb-b {
+  animation: ombreOrbFloatB 8.2s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* Envelope Gentle Idle Float (while waiting for click) */
+@keyframes envelopeIdleFloat {
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -6px, 0);
+  }
+}
+
+.envelope-idle-float {
+  animation: envelopeIdleFloat 3.4s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Iridescent Ombre Foil Shimmer Sweep across Envelope */
+@keyframes blingFoilSweep {
+  0% {
+    opacity: 0;
+    transform: translate3d(-135%, 0, 0) skewX(-20deg);
+  }
+  18% {
+    opacity: 0.9;
+  }
+  48% {
+    opacity: 0.85;
+    transform: translate3d(135%, 0, 0) skewX(-20deg);
+  }
+  49%, 100% {
+    opacity: 0;
+    transform: translate3d(135%, 0, 0) skewX(-20deg);
+  }
+}
+
+.bling-shimmer-sweep {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.55) 38%,
+    rgba(255, 234, 248, 0.72) 50%,
+    rgba(220, 242, 255, 0.55) 62%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: blingFoilSweep 3.8s cubic-bezier(0.25, 0.8, 0.25, 1) infinite;
+  will-change: transform, opacity;
+}
+
+/* Bling-Bling Diamond Star Twinkles */
+@keyframes blingGlintTwinkle {
+  0%, 100% {
+    opacity: 0.18;
+    transform: scale(0.42) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.16) rotate(45deg);
+  }
+}
+
+@keyframes blingGlintPulse {
+  0%, 100% {
+    opacity: 0.28;
+    transform: scale(0.62) rotate(-12deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.22) rotate(18deg);
+  }
+}
+
+.bling-twinkle-1 { animation: blingGlintTwinkle 2.1s ease-in-out 0s infinite; }
+.bling-twinkle-2 { animation: blingGlintPulse 2.6s ease-in-out 0.45s infinite; }
+.bling-twinkle-3 { animation: blingGlintTwinkle 2.3s ease-in-out 0.9s infinite; }
+.bling-twinkle-4 { animation: blingGlintPulse 2.8s ease-in-out 1.3s infinite; }
+.bling-twinkle-5 { animation: blingGlintTwinkle 1.9s ease-in-out 0.3s infinite; }
+.bling-twinkle-6 { animation: blingGlintPulse 2.4s ease-in-out 1.1s infinite; }
+.bling-twinkle-7 { animation: blingGlintTwinkle 2.5s ease-in-out 0.65s infinite; }
+.bling-twinkle-8 { animation: blingGlintPulse 2.2s ease-in-out 1.55s infinite; }
+
+@keyframes waxSealFloat {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+.wax-seal-breathe {
+  animation: waxSealFloat 2.5s ease-in-out infinite;
+}
+
+@keyframes snowBurst1 {
+  0% { opacity: 1; transform: translate3d(0, 0, 0) scale(0.45) rotate(0deg); }
+  100% { opacity: 0; transform: translate3d(-76px, -68px, 0) scale(1.25) rotate(-45deg); }
+}
+@keyframes snowBurst2 {
+  0% { opacity: 1; transform: translate3d(0, 0, 0) scale(0.45) rotate(0deg); }
+  100% { opacity: 0; transform: translate3d(0px, -92px, 0) scale(1.3) rotate(35deg); }
+}
+@keyframes snowBurst3 {
+  0% { opacity: 1; transform: translate3d(0, 0, 0) scale(0.45) rotate(0deg); }
+  100% { opacity: 0; transform: translate3d(78px, -66px, 0) scale(1.25) rotate(50deg); }
+}
+@keyframes snowBurst4 {
+  0% { opacity: 1; transform: translate3d(0, 0, 0) scale(0.45) rotate(0deg); }
+  100% { opacity: 0; transform: translate3d(-96px, -6px, 0) scale(1.15) rotate(-30deg); }
+}
+@keyframes snowBurst5 {
+  0% { opacity: 1; transform: translate3d(0, 0, 0) scale(0.45) rotate(0deg); }
+  100% { opacity: 0; transform: translate3d(96px, -8px, 0) scale(1.15) rotate(40deg); }
+}
+@keyframes snowBurst6 {
+  0% { opacity: 1; transform: translate3d(0, 0, 0) scale(0.45) rotate(0deg); }
+  100% { opacity: 0; transform: translate3d(-64px, 62px, 0) scale(1.2) rotate(-55deg); }
+}
+@keyframes snowBurst7 {
+  0% { opacity: 1; transform: translate3d(0, 0, 0) scale(0.45) rotate(0deg); }
+  100% { opacity: 0; transform: translate3d(66px, 60px, 0) scale(1.2) rotate(55deg); }
+}
+@keyframes snowBurst8 {
+  0% { opacity: 1; transform: translate3d(0, 0, 0) scale(0.45) rotate(0deg); }
+  100% { opacity: 0; transform: translate3d(0px, 80px, 0) scale(1.05) rotate(25deg); }
+}
+@keyframes snowBurst9 {
+  0% { opacity: 1; transform: translate3d(0, 0, 0) scale(0.4) rotate(0deg); }
+  100% { opacity: 0; transform: translate3d(-42px, -86px, 0) scale(1.18) rotate(-25deg); }
+}
+@keyframes snowBurst10 {
+  0% { opacity: 1; transform: translate3d(0, 0, 0) scale(0.4) rotate(0deg); }
+  100% { opacity: 0; transform: translate3d(44px, -84px, 0) scale(1.18) rotate(30deg); }
+}
+
+.snow-burst-p1 { animation: snowBurst1 740ms cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.snow-burst-p2 { animation: snowBurst2 760ms cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.snow-burst-p3 { animation: snowBurst3 740ms cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.snow-burst-p4 { animation: snowBurst4 700ms cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.snow-burst-p5 { animation: snowBurst5 700ms cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.snow-burst-p6 { animation: snowBurst6 740ms cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.snow-burst-p7 { animation: snowBurst7 740ms cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.snow-burst-p8 { animation: snowBurst8 680ms cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.snow-burst-p9 { animation: snowBurst9 720ms cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.snow-burst-p10 { animation: snowBurst10 720ms cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+@keyframes introAmbientSnow {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -16px, 0) rotate(0deg);
+  }
+  20% {
+    opacity: 0.78;
+  }
+  80% {
+    opacity: 0.72;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(18px, 240px, 0) rotate(90deg);
+  }
+}
+
+.intro-snow-1 { animation: introAmbientSnow 5.2s linear infinite; }
+.intro-snow-2 { animation: introAmbientSnow 6.4s linear 0.8s infinite; }
+.intro-snow-3 { animation: introAmbientSnow 5.8s linear 1.6s infinite; }
+.intro-snow-4 { animation: introAmbientSnow 6.8s linear 0.4s infinite; }
+.intro-snow-5 { animation: introAmbientSnow 5.5s linear 2.1s infinite; }
+.intro-snow-6 { animation: introAmbientSnow 6.1s linear 1.2s infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .dreamy-bg-breathe,
+  .dreamy-aura-pulse,
+  .dreamy-star-twinkle,
+  .dreamy-sparkle-pulse,
+  .dreamy-bokeh-drift,
+  .snowflake-particle,
+  .music-disc-spin,
+  .snow-letter-enter,
+  .ombre-orb-a,
+  .ombre-orb-b,
+  .envelope-idle-float,
+  .bling-shimmer-sweep,
+  .bling-twinkle-1,
+  .bling-twinkle-2,
+  .bling-twinkle-3,
+  .bling-twinkle-4,
+  .bling-twinkle-5,
+  .bling-twinkle-6,
+  .bling-twinkle-7,
+  .bling-twinkle-8,
+  .wax-seal-breathe,
+  .intro-snow-1,
+  .intro-snow-2,
+  .intro-snow-3,
+  .intro-snow-4,
+  .intro-snow-5,
+  .intro-snow-6 {
+    animation: none !important;
+  }
+  .envelope-flap-card {
+    transition-duration: 150ms !important;
+  }
+}
+
+/* Hide scrollbar for clean aesthetics */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+

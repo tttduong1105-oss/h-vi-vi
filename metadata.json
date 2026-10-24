@@ -1,0 +1,6 @@
+{
+  "name": "Thư Gửi Mùa Tuyết",
+  "description": "Website cá nhân mang phong cách winter editorial của Hạ Vi Vi — Nơi những nhân vật, câu chuyện và những bức thư mùa tuyết được lưu giữ.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
